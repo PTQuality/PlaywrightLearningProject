@@ -1,55 +1,77 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from '@playwright/test';
+import { loginData } from '../test-data/login.data';
 
-test.describe("Homepage tests", () => {
-  test("Transfer test", async ({ page }) => {
-    await page.goto("https://demo-bank.vercel.app/");
-    await page.getByTestId("login-input").fill("testerLO");
-    await page.getByTestId("password-input").fill("12345678");
-    await page.getByTestId("login-button").click();
+test.describe('Homepage tests', () => {
+  //Arrange
+  test.beforeEach(async ({ page }) => {
+    const userLogin = loginData.userLogin;
+    const userPassword = loginData.userPassword;
 
-    await page.locator("#widget_1_transfer_receiver").selectOption("2");
-    await page.locator("#widget_1_transfer_amount").fill("150");
-    await page.locator("#widget_1_transfer_title").fill("pizza");
+    await page.goto('/');
+    await page.getByTestId('login-input').fill(userLogin);
+    await page.getByTestId('password-input').fill(userPassword);
+    await page.getByTestId('login-button').click();
+  });
 
-    await page.getByRole("button", { name: "wykonaj" }).click();
-    await page.getByTestId("close-button").click();
+  test('Transfer test', async ({ page }) => {
+    //Arrange
+    const receiverId = '2';
+    const expectedTransferReceiver = 'Chuck Demobankowy';
+    const transferAmount = '150';
+    const transferTitle = 'pizza';
+    const expectedTransferMessage = `Przelew wykonany! ${expectedTransferReceiver} - ${transferAmount},00PLN - ${transferTitle}`;
 
-    await expect(page.locator("#show_messages")).toHaveText(
-      "Przelew wykonany! Chuck Demobankowy - 150,00PLN - pizza"
+    //Act
+    await page.locator('#widget_1_transfer_receiver').selectOption(receiverId);
+    await page.locator('#widget_1_transfer_amount').fill(transferAmount);
+    await page.locator('#widget_1_transfer_title').fill(transferTitle);
+
+    await page.getByRole('button', { name: 'wykonaj' }).click();
+    await page.getByTestId('close-button').click();
+
+    //Assert
+    await expect(page.locator('#show_messages')).toHaveText(
+      expectedTransferMessage,
     );
   });
 
-  test.only("Mobile top-up test", async ({ page }) => {
-    await page.goto("https://demo-bank.vercel.app/");
-    await page.getByTestId("login-input").fill("testerLO");
-    await page.getByTestId("password-input").fill("12345678");
-    await page.getByTestId("login-button").click();
+  test('Mobile top-up message test', async ({ page }) => {
+    //Arrange
+    const amountToTtransfer = '50';
+    const phoneNumberToBeSelected = '500 xxx xxx';
+    const expectedTopUpMessage = `Doładowanie wykonane! ${amountToTtransfer},00PLN na numer ${phoneNumberToBeSelected}`;
 
-    await page.locator("#widget_1_topup_receiver").selectOption("500 xxx xxx");
-    await page.locator("#widget_1_topup_amount").fill("50");
-    await page.locator("#uniform-widget_1_topup_agreement span").click();
-    await page.getByRole("button", { name: "doładuj telefon" }).click();
-    await page.getByTestId("close-button").click();
-
-    await expect(page.locator("#show_messages")).toHaveText(
-      "Doładowanie wykonane! 50,00PLN na numer 500 xxx xxx"
+    //Act
+    await page
+      .locator('#widget_1_topup_receiver')
+      .selectOption(phoneNumberToBeSelected);
+    await page.locator('#widget_1_topup_amount').fill(amountToTtransfer);
+    await page.locator('#uniform-widget_1_topup_agreement span').click();
+    await page.getByRole('button', { name: 'doładuj telefon' }).click();
+    await page.getByTestId('close-button').click();
+    //Assert
+    await expect(page.locator('#show_messages')).toHaveText(
+      expectedTopUpMessage,
     );
+  });
+
+  test('Mobile top-up value test', async ({ page }) => {
+    //Arrange
+    const amountToTtransfer = '50';
+    const phoneNumberToBeSelected = '500 xxx xxx';
+    const expectedTopUpMessage = `Doładowanie wykonane! ${amountToTtransfer},00PLN na numer ${phoneNumberToBeSelected}`;
+    const initialBalance = await page.locator('#money_value').innerText();
+    const expectedBalance = Number(initialBalance) - Number(amountToTtransfer);
+
+    //Act
+    await page
+      .locator('#widget_1_topup_receiver')
+      .selectOption(phoneNumberToBeSelected);
+    await page.locator('#widget_1_topup_amount').fill(amountToTtransfer);
+    await page.locator('#uniform-widget_1_topup_agreement span').click();
+    await page.getByRole('button', { name: 'doładuj telefon' }).click();
+    await page.getByTestId('close-button').click();
+    //Assert
+    await expect(page.locator('#money_value')).toHaveText(`${expectedBalance}`);
   });
 });
-
-// Wykonaj manualny test doładowania telefonu
-// Dodaj nowy test do pulpit.spec.ts
-// Sugerowana nazwa nowego testu: successful mobile top-up
-// Użyj codegen do nagrania testu i wygenerowania kodu
-// Pomiń nagrywanie logowania
-// Na stronie Pulpit przejdź do widoku doładowanie telefonu
-// Wybierz numer telefonu (pierwszy z listy), kwotę 50 i zaznacz checkbox
-// Kliknięciu przycisk doładuj telefon oraz zaakceptuj okno z podsumowaniem operacji
-// Zweryfikuj tekst wiadomości, możesz skorzystać z istniejącego kodu w innym teście
-// Wklej uzyskany kod do nowo przygotowanego testu
-
-// Pamiętaj o dodaniu odpowiedniej asercji dla wiadomości
-// Usuń lub zakomentuj nadmiarowy kod np: niepotrzebne akcje z click()
-// Sprawdź swój test – pamiętaj o opcji only
-// Celowo uszkodź asercję, tak aby test zakończył się niepowodzeniem i uruchom ponownie test – czy wyniki jakie otrzymałeś są czytelne?
-// Następnie napraw test i uruchom wszystkie testy razem
