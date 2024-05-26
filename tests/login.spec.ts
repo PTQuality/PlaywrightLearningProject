@@ -17,24 +17,20 @@ test.describe('User login to Demobank', () => {
     const expectedUsername = 'Jan Demobankowy';
 
     //Act
-    await loginPage.loginInput.fill(userLogin);
-    await loginPage.passwordInput.fill(userPassword);
-    await loginPage.loginButton.click();
-
-    // await loginPage.login();
+    await loginPage.login(userLogin, userPassword);
 
     //Assert
     const homePage = new HomePage(page);
     await expect(homePage.userName).toHaveText(expectedUsername);
   });
 
-  test('unsuccessful login with to short username', async ({ page }) => {
+  test('unsuccessful login with too short username', async ({ page }) => {
     //Arrange
     const tooShortUserLogin = 'tester';
     const expectedLoginErrorMsg = 'identyfikator ma min. 8 znaków';
 
     //Act
-    await loginPage.loginInput.fill(tooShortUserLogin);
+    await loginPage.login(tooShortUserLogin);
     await loginPage.loginInput.blur();
 
     //Assert
@@ -47,8 +43,7 @@ test.describe('User login to Demobank', () => {
     const expectedPasswordErrorMsge = 'hasło ma min. 8 znaków';
 
     //Act
-    await loginPage.loginInput.fill(userLogin);
-    await loginPage.passwordInput.fill(tooShortUserPassword);
+    await loginPage.login(userLogin, tooShortUserPassword);
     await loginPage.passwordInput.blur();
 
     //Assert

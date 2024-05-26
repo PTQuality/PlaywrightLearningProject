@@ -13,9 +13,16 @@ export class PaymentPage {
     name: 'wykonaj przelew',
   });
   closeModalButton = this.page.getByTestId('close-button');
-  //   await page.getByTestId('transfer_receiver').fill(transferReceiver);
-  //   await page.getByTestId('form_account_to').fill(transferAccount);
-  //   await page.getByTestId('form_amount').fill(amountToTransfer);
-  //   await page.getByRole('button', { name: 'wykonaj przelew' }).click();
-  //   await page.getByTestId('close-button').click();
+
+  async makePayment(
+    receiver: string,
+    accountNumber: string,
+    amount: string,
+  ): Promise<void> {
+    await this.transferReceiver.fill(receiver);
+    await this.accountNumberInput.fill(accountNumber);
+    await this.amountNumberInput.fill(amount);
+    await this.transferMoneyButton.click();
+    await this.closeModalButton.click();
+  }
 }

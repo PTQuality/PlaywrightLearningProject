@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 import { SideMenu } from '../components/side-menu.component';
+import { title } from 'process';
 
 export class HomePage {
   constructor(private page: Page) {}
@@ -23,4 +24,23 @@ export class HomePage {
   closeTopUpModalButton = this.page.getByTestId('close-button');
   moneyValueText = this.page.locator('#money_value');
   userName = this.page.getByTestId('user-name');
+
+  async executeQuickPayment(
+    receiverId: string,
+    amount: string,
+    title: string,
+  ): Promise<void> {
+    await this.transferReceiver.selectOption(receiverId);
+    await this.transferAmount.fill(amount);
+    await this.transferTitle.fill(title);
+    await this.transferButton.click();
+    await this.closeTransferModalButton.click();
+  }
+  async executeMobileTopUp(phoneNumber: string, amount: string): Promise<void> {
+    await this.topUpReceiver.selectOption(phoneNumber);
+    await this.topUpAmount.fill(amount);
+    await this.toUpAgreementCheckbox.click();
+    await this.topUpProceedButton.click();
+    await this.closeTopUpModalButton.click();
+  }
 }
