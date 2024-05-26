@@ -5,7 +5,7 @@ export class SideMenu {
 
   // await page.getByRole('link', { name: 'mój pulpit' }).click();
   homeLink = this.page.getByRole('link', { name: 'mój pulpit' });
-  
+
   // await page.getByRole('link', { name: 'szybki przelew' }).click();
   // await page.getByRole('link', { name: 'doładowanie telefonu' }).click();
   // await page.getByRole('link', { name: 'konta osobiste' }).click();

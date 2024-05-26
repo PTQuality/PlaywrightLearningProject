@@ -18,51 +18,65 @@ test.describe('Homepage tests', () => {
     await loginPage.login(userLogin, userPassword);
   });
 
-  test('Transfer test', async ({ page }) => {
-    //Arrange
-    const receiverId = '2';
-    const expectedTransferReceiver = 'Chuck Demobankowy';
-    const transferAmount = '150';
-    const transferTitle = 'pizza';
-    const expectedTransferMessage = `Przelew wykonany! ${expectedTransferReceiver} - ${transferAmount},00PLN - ${transferTitle}`;
+  test(
+    'Transfer test',
+    { tag: ['@homepage', '@integration'] },
+    async ({ page }) => {
+      //Arrange
+      const receiverId = '2';
+      const expectedTransferReceiver = 'Chuck Demobankowy';
+      const transferAmount = '150';
+      const transferTitle = 'pizza';
+      const expectedTransferMessage = `Przelew wykonany! ${expectedTransferReceiver} - ${transferAmount},00PLN - ${transferTitle}`;
 
-    //Act
-    homePage.executeQuickPayment(receiverId, transferAmount, transferTitle);
+      //Act
+      homePage.executeQuickPayment(receiverId, transferAmount, transferTitle);
 
-    //Assert
-    await expect(homePage.transferMessage).toHaveText(expectedTransferMessage);
-  });
+      //Assert
+      await expect(homePage.transferMessage).toHaveText(
+        expectedTransferMessage,
+      );
+    },
+  );
 
-  test('Mobile top-up message test', async ({ page }) => {
-    //Arrange
-    const amountToTransfer = '50';
-    const phoneNumberToBeSelected = '500 xxx xxx';
-    const expectedTopUpMessage = `Doładowanie wykonane! ${amountToTransfer},00PLN na numer ${phoneNumberToBeSelected}`;
+  test(
+    'Mobile top-up message test',
+    { tag: ['@homepage', '@integration'] },
+    async ({ page }) => {
+      //Arrange
+      const amountToTransfer = '50';
+      const phoneNumberToBeSelected = '500 xxx xxx';
+      const expectedTopUpMessage = `Doładowanie wykonane! ${amountToTransfer},00PLN na numer ${phoneNumberToBeSelected}`;
 
-    //Act
-    await homePage.executeMobileTopUp(
-      phoneNumberToBeSelected,
-      amountToTransfer,
-    );
+      //Act
+      await homePage.executeMobileTopUp(
+        phoneNumberToBeSelected,
+        amountToTransfer,
+      );
 
-    //Arrange
-    await expect(homePage.transferMessage).toHaveText(expectedTopUpMessage);
-  });
+      //Arrange
+      await expect(homePage.transferMessage).toHaveText(expectedTopUpMessage);
+    },
+  );
 
-  test('Mobile top-up value test', async ({ page }) => {
-    //Arrange
-    const amountTotransfer = '50';
-    const phoneNumberToBeSelected = '500 xxx xxx';
-    const initialBalance = await homePage.moneyValueText.innerText();
-    const expectedBalance = Number(initialBalance) - Number(amountTotransfer);
+  test(
+    'Mobile top-up value test',
+    { tag: ['@homepage', '@integration'] },
+    async ({ page }) => {
+      //Arrange
+      const amountTotransfer = '50';
+      const phoneNumberToBeSelected = '500 xxx xxx';
+      const initialBalance = await homePage.moneyValueText.innerText();
+      const expectedBalance = Number(initialBalance) - Number(amountTotransfer);
 
-    //Act
-    await homePage.executeMobileTopUp(
-      phoneNumberToBeSelected,
-      amountTotransfer,
-    );
+      //Act
+      await homePage.executeMobileTopUp(
+        phoneNumberToBeSelected,
+        amountTotransfer,
+      );
 
-    //Assert
-    await expect(homePage.moneyValueText).toHaveText(`${expectedBalance}`);
-  });
+      //Assert
+      await expect(homePage.moneyValueText).toHaveText(`${expectedBalance}`);
+    },
+  );
 });
